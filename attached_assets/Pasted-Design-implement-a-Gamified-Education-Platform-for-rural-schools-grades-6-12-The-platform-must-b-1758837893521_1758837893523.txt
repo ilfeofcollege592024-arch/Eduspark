@@ -1,0 +1,168 @@
+Design & implement a Gamified Education Platform for rural schools, grades 6–12.
+The platform must be fully functional, multilingual (English / Hindi / Odia), and offline-first.
+Navigation must always allow: Back | Home | Logout/Exit | Language Toggle.
+
+🔐 Authentication & Access
+
+Login Page inspired by GitHub.
+
+Portals: Student | Teacher | Developer.
+
+Login options: Email+Password, Google OAuth.
+
+Features: “Forgot Password” → reset flow; “Sign Up” → validation + confirmation.
+
+Offline Access (students only): bypass login, load cached lessons.
+
+Enter button must be animated.
+
+🎓 Student Portal
+1. Grade Selection
+
+After login → Student chooses Grade (6–12).
+
+Redirects to that grade’s Subjects Dashboard.
+
+2. Subjects Dashboard (per grade)
+
+Subjects vary by grade:
+
+Grade 6–8: Math, Science, Social Science, English, Local Language.
+
+Grade 9–10: Math, Science, Social Science, English, Odia/Hindi.
+
+Grade 11–12: Math, Physics, Chemistry, Biology, Social Studies, English.
+
+Each subject expands → Units → Chapters → Lessons.
+
+Lesson page has:
+
+📖 Lesson Content (text, diagrams, explanations).
+
+🎮 “Learn this as a Game” button.
+
+3. Gamified Learning
+
+Grade 9 Games (fully functional prototype):
+
+(a) Science – Motion Simulation Game
+
+Interactive object reacts to Newton’s Laws.
+
+Right side: theory explanation; left side: experiment area.
+
+Student drags/pushes object to test laws.
+
+Scoring: XP for correct action, retry hints for mistakes.
+
+(b) Mathematics – Algebra Puzzle Game
+
+Grid puzzle with equations.
+
+Correct answers unlock next blocks.
+
+Completing puzzle reveals hidden word.
+
+XP + Achievements awarded.
+
+Other grades (6–8, 10–12):
+Game button opens message:
+“⚠️ Game not yet available for this grade. Please continue with the lesson.”
+
+4. Progress Tracker
+
+Circular progress charts by subject.
+
+Drill down: subject → units → lessons → completion % + last accessed.
+
+Resume from last checkpoint.
+
+5. Leaderboard
+
+Shows Top 10 students by XP in class.
+
+Student’s own rank highlighted.
+
+Clicking a student → show their XP + progress breakdown.
+
+🧑‍🏫 Teacher Portal
+Dashboard Features
+
+Class Progress: Charts for each grade/class.
+
+Student Reports: View individual progress & XP.
+
+Active Students: List of students currently online/missing.
+
+Syllabus Coverage: % of subjects covered in each grade.
+
+Daily Report: Teacher uploads text, audio, or files.
+
+Faculty Development: Access to courses.
+
+📩 Mail Box (NEW FEATURE)
+
+NGOs and Corporates can send mails to teachers.
+
+Teachers review mails → recommend bright students for scholarships.
+
+Mails can include: company name, scholarship criteria, apply button.
+
+🌐 Multilingual Support
+
+All text available in JSON for English / Hindi / Odia.
+
+Toggle at top-right of every screen.
+
+UI reloads instantly in chosen language.
+
+📦 Offline-First
+
+Lessons, progress cached in IndexedDB.
+
+Syncs with cloud when online.
+
+Conflict resolution: latest timestamp wins.
+
+🏗️ Deliverables (from AI)
+
+Frontend (React/Tailwind):
+
+LoginPage
+
+GradeSelectionPage
+
+SubjectDashboard
+
+LessonPage (with “Play as Game”)
+
+MotionGame (Grade 9 Science)
+
+AlgebraPuzzleGame (Grade 9 Math)
+
+ProgressTracker + Leaderboard
+
+TeacherDashboard + MailBox
+
+Backend (Node/Express + Firebase/Postgres):
+
+Auth API (/login, /register, /googleAuth)
+
+Syllabus API (/syllabus/:grade)
+
+Progress API (/progress/:studentId)
+
+Reports API (/reports/:teacherId)
+
+Mail API (/mails/:teacherId)
+
+Leaderboard API (/leaderboard/:grade)
+
+Sync API for offline → online merges
+
+⚡ Final Instruction to AI:
+Generate production-ready modular React frontend + Node/Express backend.
+Each click (lesson, game, progress, mail, leaderboard) must perform a real action.
+Grade 9 has fully working Science + Math games; all other grades must still work for lessons and navigation.
+Teacher Mail Box must support sending/receiving messages from NGOs/Corporates about scholarships.
+Every screen must have back, home, exit, and language toggle.

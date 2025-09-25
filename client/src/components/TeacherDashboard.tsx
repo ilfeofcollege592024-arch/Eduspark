@@ -6,8 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import Navigation from "./Navigation";
-import { Users, BookOpen, TrendingUp, Mail, Upload, Award, AlertCircle } from "lucide-react";
+import { Users, BookOpen, TrendingUp, Mail, Upload, Award, AlertCircle, Calendar, Clock, MessageSquare, Target, Filter, Plus, CheckCircle } from "lucide-react";
 
 interface ClassProgress {
   grade: number;
@@ -25,6 +29,40 @@ interface StudentReport {
   lessonsCompleted: number;
   lastActive: string;
   status: "online" | "offline" | "away";
+  performance: "excellent" | "good" | "average" | "needs_attention";
+  assignments: {
+    pending: number;
+    completed: number;
+    overdue: number;
+  };
+  subjects: {
+    [key: string]: {
+      progress: number;
+      lastScore: number;
+    };
+  };
+}
+
+interface Assignment {
+  id: string;
+  title: string;
+  subject: string;
+  grade: number;
+  dueDate: string;
+  type: "homework" | "quiz" | "project";
+  submissions: number;
+  totalStudents: number;
+  status: "active" | "completed" | "overdue";
+}
+
+interface Announcement {
+  id: string;
+  title: string;
+  content: string;
+  priority: "high" | "medium" | "low";
+  targetGrades: number[];
+  createdAt: string;
+  readBy: string[];
 }
 
 interface TeacherDashboardProps {
@@ -36,6 +74,10 @@ export default function TeacherDashboard({ onBack, onMailboxOpen }: TeacherDashb
   const { t } = useLanguage();
   const { user } = useAuth();
   const [selectedGrade, setSelectedGrade] = useState<number>(9);
+  const [showNewAssignment, setShowNewAssignment] = useState(false);
+  const [showNewAnnouncement, setShowNewAnnouncement] = useState(false);
+  const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [searchTerm, setSearchTerm] = useState("");
 
   // Mock data - in real app would come from API
   const classProgress: ClassProgress[] = [
@@ -49,11 +91,49 @@ export default function TeacherDashboard({ onBack, onMailboxOpen }: TeacherDashb
   ];
 
   const studentReports: StudentReport[] = [
-    { id: "1", name: "Priya Sharma", grade: 9, xp: 2450, lessonsCompleted: 48, lastActive: "5 min ago", status: "online" },
-    { id: "2", name: "Arjun Patel", grade: 9, xp: 2180, lessonsCompleted: 42, lastActive: "1 hour ago", status: "away" },
-    { id: "3", name: "Kavya Singh", grade: 9, xp: 1950, lessonsCompleted: 39, lastActive: "2 hours ago", status: "offline" },
-    { id: "4", name: "Rahul Kumar", grade: 9, xp: 1850, lessonsCompleted: 37, lastActive: "30 min ago", status: "online" },
-    { id: "5", name: "Sneha Reddy", grade: 9, xp: 1720, lessonsCompleted: 35, lastActive: "3 hours ago", status: "offline" }
+    { 
+      id: "1", name: "Priya Sharma", grade: 9, xp: 2450, lessonsCompleted: 48, lastActive: "5 min ago", status: "online",
+      performance: "excellent", 
+      assignments: { pending: 2, completed: 15, overdue: 0 },
+      subjects: { math: { progress: 92, lastScore: 95 }, science: { progress: 88, lastScore: 89 }, english: { progress: 85, lastScore: 87 } }
+    },
+    { 
+      id: "2", name: "Arjun Patel", grade: 9, xp: 2180, lessonsCompleted: 42, lastActive: "1 hour ago", status: "away",
+      performance: "good",
+      assignments: { pending: 3, completed: 12, overdue: 1 },
+      subjects: { math: { progress: 78, lastScore: 82 }, science: { progress: 85, lastScore: 88 }, english: { progress: 76, lastScore: 79 } }
+    },
+    { 
+      id: "3", name: "Kavya Singh", grade: 9, xp: 1950, lessonsCompleted: 39, lastActive: "2 hours ago", status: "offline",
+      performance: "good",
+      assignments: { pending: 1, completed: 14, overdue: 0 },
+      subjects: { math: { progress: 82, lastScore: 86 }, science: { progress: 80, lastScore: 83 }, english: { progress: 88, lastScore: 91 } }
+    },
+    { 
+      id: "4", name: "Rahul Kumar", grade: 9, xp: 1850, lessonsCompleted: 37, lastActive: "30 min ago", status: "online",
+      performance: "average",
+      assignments: { pending: 4, completed: 10, overdue: 2 },
+      subjects: { math: { progress: 65, lastScore: 70 }, science: { progress: 72, lastScore: 75 }, english: { progress: 68, lastScore: 72 } }
+    },
+    { 
+      id: "5", name: "Sneha Reddy", grade: 9, xp: 1720, lessonsCompleted: 35, lastActive: "3 hours ago", status: "offline",
+      performance: "needs_attention",
+      assignments: { pending: 5, completed: 8, overdue: 3 },
+      subjects: { math: { progress: 58, lastScore: 62 }, science: { progress: 60, lastScore: 65 }, english: { progress: 55, lastScore: 59 } }
+    }
+  ];
+
+  const assignments: Assignment[] = [
+    { id: "1", title: "Linear Equations Practice", subject: "Mathematics", grade: 9, dueDate: "Dec 25, 2024", type: "homework", submissions: 18, totalStudents: 25, status: "active" },
+    { id: "2", title: "Newton's Laws Quiz", subject: "Science", grade: 9, dueDate: "Dec 22, 2024", type: "quiz", submissions: 23, totalStudents: 25, status: "active" },
+    { id: "3", title: "Essay on Rural Development", subject: "English", grade: 9, dueDate: "Dec 20, 2024", type: "project", submissions: 20, totalStudents: 25, status: "overdue" },
+    { id: "4", title: "Chemical Reactions Lab", subject: "Science", grade: 10, dueDate: "Dec 28, 2024", type: "project", submissions: 15, totalStudents: 22, status: "active" }
+  ];
+
+  const announcements: Announcement[] = [
+    { id: "1", title: "Winter Break Schedule", content: "Classes will resume on January 8th, 2025. Have a great vacation!", priority: "high", targetGrades: [6,7,8,9,10,11,12], createdAt: "2 hours ago", readBy: ["1","2","3"] },
+    { id: "2", title: "Science Fair Registration", content: "Register for the annual science fair before December 30th.", priority: "medium", targetGrades: [8,9,10], createdAt: "1 day ago", readBy: ["1","4","5"] },
+    { id: "3", title: "New Learning Resources", content: "New interactive modules added to Mathematics and Science courses.", priority: "low", targetGrades: [9,10,11], createdAt: "3 days ago", readBy: ["2","3"] }
   ];
 
   const syllabusData = [

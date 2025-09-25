@@ -21,6 +21,33 @@ interface ScholarshipMail {
   unread: boolean;
   starred: boolean;
   timestamp: string;
+  category: "scholarship" | "internship" | "partnership" | "donation";
+  priority: "high" | "medium" | "low";
+  status: "open" | "applied" | "closed" | "expired";
+  applicationsSubmitted: number;
+  maxApplications?: number;
+}
+
+interface StudentApplication {
+  id: string;
+  studentName: string;
+  grade: number;
+  scholarshipId: string;
+  status: "submitted" | "under_review" | "accepted" | "rejected";
+  submittedDate: string;
+  documents: string[];
+  teacherRecommendation: string;
+}
+
+interface NGOPartnership {
+  id: string;
+  name: string;
+  type: "education" | "healthcare" | "environment" | "technology";
+  contact: string;
+  activePrograms: number;
+  students_helped: number;
+  partnership_since: string;
+  status: "active" | "pending" | "inactive";
 }
 
 interface MailBoxProps {
@@ -32,8 +59,28 @@ export default function MailBox({ onBack }: MailBoxProps) {
   const [selectedMail, setSelectedMail] = useState<ScholarshipMail | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [showCompose, setShowCompose] = useState(false);
+  const [filterCategory, setFilterCategory] = useState<string>("all");
+  const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [showApplications, setShowApplications] = useState(false);
+  const [showPartnerships, setShowPartnerships] = useState(false);
+  const [sortBy, setSortBy] = useState<string>("newest");
 
-  // Mock scholarship mails from NGOs and corporates
+  // Mock student applications
+  const studentApplications: StudentApplication[] = [
+    { id: "1", studentName: "Priya Sharma", grade: 9, scholarshipId: "1", status: "submitted", submittedDate: "Dec 20, 2024", documents: ["grade_sheet.pdf", "id_proof.pdf"], teacherRecommendation: "Excellent student with outstanding performance in STEM subjects." },
+    { id: "2", studentName: "Arjun Patel", grade: 10, scholarshipId: "2", status: "under_review", submittedDate: "Dec 18, 2024", documents: ["transcripts.pdf", "project_portfolio.pdf"], teacherRecommendation: "Innovative thinker with leadership qualities." },
+    { id: "3", studentName: "Kavya Singh", grade: 11, scholarshipId: "3", status: "accepted", submittedDate: "Dec 15, 2024", documents: ["certificates.pdf", "essay.pdf"], teacherRecommendation: "Dedicated student with strong community involvement." }
+  ];
+
+  // Mock NGO partnerships
+  const ngoPartnerships: NGOPartnership[] = [
+    { id: "1", name: "Tata Trust", type: "education", contact: "partnerships@tata.com", activePrograms: 12, students_helped: 450, partnership_since: "2020", status: "active" },
+    { id: "2", name: "Infosys Foundation", type: "technology", contact: "education@infosys.org", activePrograms: 8, students_helped: 320, partnership_since: "2021", status: "active" },
+    { id: "3", name: "Azim Premji Foundation", type: "education", contact: "scholars@azimpremji.org", activePrograms: 15, students_helped: 680, partnership_since: "2019", status: "active" },
+    { id: "4", name: "Reliance Foundation", type: "education", contact: "education@reliance.com", activePrograms: 6, students_helped: 290, partnership_since: "2022", status: "pending" }
+  ];
+
+  // Enhanced scholarship mails from NGOs and corporates
   const scholarshipMails: ScholarshipMail[] = [
     {
       id: "1",
@@ -46,7 +93,12 @@ export default function MailBox({ onBack }: MailBoxProps) {
       amount: "₹50,000 per year",
       unread: true,
       starred: false,
-      timestamp: "2 hours ago"
+      timestamp: "2 hours ago",
+      category: "scholarship",
+      priority: "high",
+      status: "open",
+      applicationsSubmitted: 3,
+      maxApplications: 50
     },
     {
       id: "2", 
@@ -59,7 +111,12 @@ export default function MailBox({ onBack }: MailBoxProps) {
       amount: "₹75,000 per year",
       unread: true,
       starred: true,
-      timestamp: "1 day ago"
+      timestamp: "1 day ago",
+      category: "scholarship",
+      priority: "high",
+      status: "open",
+      applicationsSubmitted: 5,
+      maxApplications: 30
     },
     {
       id: "3",
@@ -72,7 +129,12 @@ export default function MailBox({ onBack }: MailBoxProps) {
       amount: "₹40,000 per year",
       unread: false,
       starred: false,
-      timestamp: "3 days ago"
+      timestamp: "3 days ago",
+      category: "scholarship",
+      priority: "medium",
+      status: "applied",
+      applicationsSubmitted: 2,
+      maxApplications: 25
     },
     {
       id: "4",
@@ -85,7 +147,48 @@ export default function MailBox({ onBack }: MailBoxProps) {
       amount: "₹60,000 + Tech Kit",
       unread: false,
       starred: true,
-      timestamp: "5 days ago"
+      timestamp: "5 days ago",
+      category: "scholarship",
+      priority: "medium",
+      status: "open",
+      applicationsSubmitted: 1,
+      maxApplications: 20
+    },
+    {
+      id: "5",
+      from: "partnerships@educateall.org",
+      company: "EducateAll NGO",
+      subject: "Teacher Training Partnership Program",
+      content: "We invite your school to participate in our comprehensive teacher training program. This includes modern teaching methodologies and digital classroom techniques.",
+      criteria: ["Rural schools", "5+ teachers", "Basic computer access", "Commitment to 6-month program"],
+      deadline: "January 31, 2025",
+      amount: "Free Training + Certification",
+      unread: true,
+      starred: false,
+      timestamp: "6 hours ago",
+      category: "partnership",
+      priority: "high",
+      status: "open",
+      applicationsSubmitted: 0,
+      maxApplications: 10
+    },
+    {
+      id: "6",
+      from: "internships@techfuture.org",
+      company: "Tech Future Foundation",
+      subject: "Summer Internship Program 2025",
+      content: "Exciting internship opportunities for students interested in technology and coding. Remote internships with stipend and mentorship included.",
+      criteria: ["Grades 11-12", "Basic programming knowledge", "English proficiency", "Commitment to 8 weeks"],
+      deadline: "February 15, 2025",
+      amount: "₹15,000 stipend",
+      unread: false,
+      starred: true,
+      timestamp: "2 days ago",
+      category: "internship",
+      priority: "medium",
+      status: "open",
+      applicationsSubmitted: 0,
+      maxApplications: 50
     }
   ];
 
@@ -111,10 +214,42 @@ export default function MailBox({ onBack }: MailBoxProps) {
     // In real app, would redirect to application form
   };
 
-  const filteredMails = scholarshipMails.filter(mail =>
-    mail.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    mail.company.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredMails = scholarshipMails.filter(mail => {
+    const matchesSearch = mail.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         mail.company.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = filterCategory === "all" || mail.category === filterCategory;
+    const matchesStatus = filterStatus === "all" || mail.status === filterStatus;
+    return matchesSearch && matchesCategory && matchesStatus;
+  });
+
+  const sortedMails = [...filteredMails].sort((a, b) => {
+    switch (sortBy) {
+      case "newest": return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+      case "oldest": return new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
+      case "deadline": return new Date(a.deadline).getTime() - new Date(b.deadline).getTime();
+      case "amount": return parseInt(b.amount.replace(/[^0-9]/g, '')) - parseInt(a.amount.replace(/[^0-9]/g, ''));
+      default: return 0;
+    }
+  });
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "open": return "bg-green-500";
+      case "applied": return "bg-blue-500";
+      case "closed": return "bg-gray-500";
+      case "expired": return "bg-red-500";
+      default: return "bg-gray-500";
+    }
+  };
+
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case "high": return "text-red-600";
+      case "medium": return "text-yellow-600";
+      case "low": return "text-green-600";
+      default: return "text-gray-600";
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">

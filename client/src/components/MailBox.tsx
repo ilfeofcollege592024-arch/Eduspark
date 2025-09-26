@@ -211,7 +211,8 @@ export default function MailBox({ onBack }: MailBoxProps) {
 
   const handleApplyScholarship = (mailId: string) => {
     console.log("Apply for scholarship:", mailId);
-    // In real app, would redirect to application form
+    // Open application form or redirect to external application
+    window.open(`https://scholarship-portal.edu/apply/${mailId}`, '_blank');
   };
 
   const filteredMails = scholarshipMails.filter(mail => {
@@ -375,6 +376,8 @@ export default function MailBox({ onBack }: MailBoxProps) {
                   </Alert>
 
                   <div className="flex gap-3">
+                        // In real app, would send recommendation to NGO/Corporate
+                        alert("Recommendation submitted successfully!");
                     <Button
                       onClick={() => handleRecommendStudent(selectedMail.id)}
                       className="hover-elevate"
@@ -390,7 +393,7 @@ export default function MailBox({ onBack }: MailBoxProps) {
                       data-testid="button-apply-scholarship"
                     >
                       <GraduationCap className="w-4 h-4 mr-2" />
-                      View Application
+                      Apply Now
                     </Button>
                   </div>
                 </CardContent>
@@ -406,6 +409,33 @@ export default function MailBox({ onBack }: MailBoxProps) {
               </Card>
             )}
           </div>
+
+          {/* Statistics Card */}
+          <Card className="mt-6">
+            <CardHeader>
+              <h3 className="font-semibold">Scholarship Statistics</h3>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                <div>
+                  <div className="text-2xl font-bold text-primary">24</div>
+                  <div className="text-sm text-muted-foreground">Total Opportunities</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-primary">8</div>
+                  <div className="text-sm text-muted-foreground">Students Recommended</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-primary">5</div>
+                  <div className="text-sm text-muted-foreground">Applications Approved</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-primary">₹2.5L</div>
+                  <div className="text-sm text-muted-foreground">Total Scholarships</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Student Recommendation Modal */}

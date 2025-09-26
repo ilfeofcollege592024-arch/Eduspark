@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import Navigation from "./Navigation";
-import { Users, BookOpen, TrendingUp, Mail, Upload, Award, AlertCircle, Calendar, Clock, MessageSquare, Target, Filter, Plus, CheckCircle, BarChart3, FileText, Video, Mic, Image } from "lucide-react";
+import { Users, BookOpen, TrendingUp, Mail, Upload, Award, CircleAlert as AlertCircle, Calendar, Clock, MessageSquare, Target, Filter, Plus, CircleCheck as CheckCircle, ChartBar as BarChart3, FileText, Video, Mic, Image } from "lucide-react";
 
 interface ClassProgress {
   grade: number;

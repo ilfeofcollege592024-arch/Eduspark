@@ -2,7 +2,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Home, Power, Sun, Moon, Globe } from "lucide-react";
+import { ArrowLeft, Chrome as Home, Power, Sun, Moon, Globe } from "lucide-react";
 
 interface NavigationProps {
   onBack?: () => void;

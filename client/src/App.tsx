@@ -27,7 +27,8 @@ import NotFound from "@/pages/not-found";
 interface AppState {
   selectedGrade: number | null;
   selectedSubject: any | null;
-  currentView: string;
+  currentView: string | null;
+  isInitialized: boolean;
 }
 
 function AppContent() {
@@ -36,8 +37,29 @@ function AppContent() {
   const [appState, setAppState] = useState<AppState>({
     selectedGrade: null,
     selectedSubject: null,
-    currentView: "login"
+    currentView: null,
+    isInitialized: false
   });
+
+  // Initialize app state based on user role
+  React.useEffect(() => {
+    if (isAuthenticated && user && !appState.isInitialized) {
+      const initialView = user.role === "teacher" ? "teacher-dashboard" : "grade-selection";
+      setAppState(prev => ({
+        ...prev,
+        currentView: initialView,
+        isInitialized: true
+      }));
+    } else if (!isAuthenticated && appState.isInitialized) {
+      // Reset state when user logs out
+      setAppState({
+        selectedGrade: null,
+        selectedSubject: null,
+        currentView: null,
+        isInitialized: false
+      });
+    }
+  }, [isAuthenticated, user, appState.isInitialized]);
 
   // Handle navigation between views
   const handleGradeSelect = (grade: number) => {
@@ -107,17 +129,20 @@ function AppContent() {
         setAppState(prev => ({ ...prev, currentView: "teacher-dashboard" }));
         break;
       default:
-        setAppState(prev => ({ ...prev, currentView: "grade-selection" }));
+        const defaultView = user?.role === "teacher" ? "teacher-dashboard" : "grade-selection";
+        setAppState(prev => ({ ...prev, currentView: defaultView }));
     }
   };
 
   const handleHomeNavigation = () => {
     console.log("Home navigation triggered");
-    if (user?.role === "student") {
-      setAppState(prev => ({ ...prev, currentView: "grade-selection" }));
-    } else {
-      setAppState(prev => ({ ...prev, currentView: "teacher-dashboard" }));
-    }
+    const homeView = user?.role === "teacher" ? "teacher-dashboard" : "grade-selection";
+    setAppState(prev => ({ 
+      ...prev, 
+      currentView: homeView,
+      selectedGrade: null,
+      selectedSubject: null
+    }));
   };
 
   // Show login page if not authenticated
@@ -125,11 +150,16 @@ function AppContent() {
     return <LoginPage />;
   }
 
-  // Route to appropriate dashboard based on user role
-  if (user?.role === "teacher" && appState.currentView === "login") {
-    setAppState(prev => ({ ...prev, currentView: "teacher-dashboard" }));
-  } else if (user?.role === "student" && appState.currentView === "login") {
-    setAppState(prev => ({ ...prev, currentView: "grade-selection" }));
+  // Show loading state while initializing
+  if (!appState.isInitialized || !appState.currentView) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading your dashboard...</p>
+        </div>
+      </div>
+    );
   }
 
   // Render current view based on app state
@@ -215,14 +245,10 @@ function AppContent() {
         );
 
       default:
-        return user?.role === "teacher" ? (
-          <TeacherDashboard 
-            onBack={handleBackNavigation}
-            onMailboxOpen={handleNavigateToMailbox}
-          />
-        ) : (
-          <GradeSelection onGradeSelect={handleGradeSelect} />
-        );
+        // Fallback to appropriate default view
+        const fallbackView = user?.role === "teacher" ? "teacher-dashboard" : "grade-selection";
+        setAppState(prev => ({ ...prev, currentView: fallbackView }));
+        return null;
     }
   };
 

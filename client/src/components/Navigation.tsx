@@ -77,6 +77,13 @@ export default function Navigation({ onBack, onHome, showBack = true, showHome =
         )}
       </div>
 
+      {/* User Role Indicator */}
+      <div className="flex items-center gap-2">
+        <div className="text-sm text-muted-foreground">
+          {user?.role === "teacher" ? "👨‍🏫 Teacher" : user?.role === "student" ? "🎓 Student" : "👨‍💻 Developer"}
+        </div>
+        <div className="w-px h-4 bg-border"></div>
+      </div>
       <div className="flex items-center gap-2">
         {/* Language Toggle */}
         <Button

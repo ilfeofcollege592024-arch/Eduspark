@@ -23,6 +23,9 @@ export default function LoginPage() {
     try {
       await login(email, password, selectedRole);
       console.log("Login successful for role:", selectedRole);
+      // Clear form after successful login
+      setEmail("");
+      setPassword("");
     } catch (error) {
       console.error("Login failed:", error);
     } finally {

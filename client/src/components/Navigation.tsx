@@ -14,7 +14,7 @@ interface NavigationProps {
 export default function Navigation({ onBack, onHome, showBack = true, showHome = true }: NavigationProps) {
   const { t, language, setLanguage } = useLanguage();
   const { theme, toggleTheme } = useTheme();
-  const { logout, isOffline } = useAuth();
+  const { logout, isOffline, user } = useAuth();
 
   const handleLanguageToggle = () => {
     const languages = ["en", "hi", "od"] as const;
